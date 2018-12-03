@@ -1,0 +1,24 @@
+{
+  "name": "webreq",
+  "version": "0.1.0",
+  "description": "Small and simple module for handling HTTP/HTTPS requests.",
+  "main": "./lib/webreq.js",
+  "scripts": {
+    "test": "nyc mocha --timeout 10000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RedeployAB/webreq.git"
+  },
+  "keywords": [
+    "HTTP",
+    "HTTPS",
+    "request"
+  ],
+  "author": "Karl Wallenius",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RedeployAB/webreq/issues"
+  },
+  "homepage": "https://github.com/RedeployAB/webreq#readme"
+}
