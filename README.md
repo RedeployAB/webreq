@@ -201,7 +201,7 @@ webreq.put(uri, [options], [callback]);
 
 **NOTE**: Not tested.
 
-Uses `request()` but enforces `method: PUT` in it's options.
+Uses `request()` but enforces `method: PATCH` in it's options.
 
 ```js
 webreq.put(uri, [options], [callback]);
@@ -217,6 +217,5 @@ webreq.delete(uri, [options], [callback]);
 
 ## Todo
 
-* Add unit tests.
 * Test/Add `PATCH`.
 * Add file upload/download functionality.
