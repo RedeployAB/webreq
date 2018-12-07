@@ -1,10 +1,7 @@
 const { expect } = require('chai');
 const url = require('url');
-const { Passthrough } = require('stream');
-const http = require('http');
-const https = require('https');
 
-const { createRequestOptions, parseResponseBody } = require('../lib/request-utils');
+const { createRequestOptions, parseResponseBody } = require('../lib/utils');
 
 describe('request-utils', () => {
 
