@@ -5,7 +5,7 @@ const https = require('https');
 const http = require('http');
 const assert = require('assert');
 
-const requestUtils = require('../lib/request-utils');
+const requestUtils = require('../lib/utils');
 const webreq = require('../lib/webreq');
 
 describe('webreq', () => {
