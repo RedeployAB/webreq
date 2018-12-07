@@ -1,6 +1,6 @@
 {
   "name": "webreq",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Small and simple module for handling HTTP/HTTPS requests.",
   "main": "./lib/webreq.js",
   "scripts": {
@@ -20,5 +20,14 @@
   "bugs": {
     "url": "https://github.com/RedeployAB/webreq/issues"
   },
-  "homepage": "https://github.com/RedeployAB/webreq#readme"
+  "homepage": "https://github.com/RedeployAB/webreq#readme",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "nyc": "^13.1.0",
+    "sinon": "^7.1.1"
+  },
+  "engines": {
+    "node": ">=8.5.0"
+  }
 }

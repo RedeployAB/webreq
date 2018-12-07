@@ -92,10 +92,51 @@ let options = {
     method: "GET"|"POST"|"PUT"|"DELETE", // Optional. Will default to GET.
     headers: {}, // Optional. Depending on method used and input data is used, Content-Type and Content-Lengt will be checked and enforced.
     body: {}, // Optional for GET requests. Mandatory for POST, PUT, PATCH. The data to send with the request.
-    parse: true|false, // Optional. Default is true. If true it will try to parse the response according to MIME-type, if false will return pure string.
+    parse: true|false, // Optional. Default is true. If true it will try to parse the response according to MIME type, if false will return pure string.
     bodyOnly: true|false, // Optional. Default is true. If true it will only return the response body, if false it will return a Response object, statusCode, headers and body.
 }
 ```
+
+#### Output
+
+Depending on the set of options being used, output will differ.
+If `bodyOnly` is set to true (default behaviour), it will only return the response body like so:
+
+```js
+webreq.get('https://someurl', { bodyOnly: true, parse: true }).then(res => {
+    console.log(res);  // { message: 'hello' } - object 
+});
+```
+
+If it's set to `false` it will return a `Response` object containing `statusCode`, `headers` and `body`, like so:
+
+```js
+webreq.get('https://someurl', { bodyOnly: false, parse: true }).then(res => {
+    console.log(res.statusCode);    // 200                                      - number
+    console.log(res.headers);       // { 'content-type': 'application/json' }   - object
+    console.log(res.body);          // { message: 'hello' }                     - object 
+});
+```
+
+If `parse` is set to true (default behaviour), it will attempt to parse the body according to it's MIME type (`JSON` is currently supported).
+The example above shows this behaviour.
+
+```js
+webreq.get('https://someurl', { bodyOnly: true, parse: false }).then(res => {
+    console.log(res);  // '{"message":'hello'}" - string
+});
+```
+
+If it's set to `false` it will attempt to parse the body.
+
+```js
+webreq.get('https://someurl', { bodyOnly: false, parse: false }).then(res => {
+    console.log(res.statusCode);    // 200                                      - number
+    console.log(res.headers);       // { 'content-type': 'application/json' }   - object
+    console.log(res.body);          // '{"message":'hello'}"                    - string
+});
+```
+
 
 #### `request()`
 
@@ -201,7 +242,7 @@ webreq.put(uri, [options], [callback]);
 
 **NOTE**: Not tested.
 
-Uses `request()` but enforces `method: PUT` in it's options.
+Uses `request()` but enforces `method: PATCH` in it's options.
 
 ```js
 webreq.put(uri, [options], [callback]);
@@ -217,6 +258,5 @@ webreq.delete(uri, [options], [callback]);
 
 ## Todo
 
-* Add unit tests.
-* Test/Add `PATCH`.
+* Test `PATCH`.
 * Add file upload/download functionality.
