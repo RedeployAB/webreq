@@ -1,6 +1,7 @@
 # webreq
 
 [![Build Status](https://travis-ci.com/RedeployAB/webreq.svg?branch=master)](https://travis-ci.com/RedeployAB/webreq)
+[![codecov](https://codecov.io/gh/RedeployAB/webreq/branch/master/graph/badge.svg)](https://codecov.io/gh/RedeployAB/webreq)
 
 Small and simple module for handling HTTP/HTTPS requests.
 
