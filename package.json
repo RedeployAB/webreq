@@ -4,7 +4,8 @@
   "description": "Small and simple module for handling HTTP/HTTPS requests.",
   "main": "./lib/webreq.js",
   "scripts": {
-    "test": "nyc mocha --timeout 10000"
+    "test": "nyc mocha --timeout 10000",
+    "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
   },
   "repository": {
     "type": "git",

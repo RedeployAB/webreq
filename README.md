@@ -1,5 +1,7 @@
 # webreq
 
+[![Build Status](https://travis-ci.com/RedeployAB/webreq.svg?branch=master)](https://travis-ci.com/RedeployAB/webreq)
+
 Small and simple module for handling HTTP/HTTPS requests.
 
 * [Information](#information)

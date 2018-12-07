@@ -23,3 +23,5 @@ build/
 .nyc_output
 test-results.xml
 webreq*.tgz
+coverage
+*.lcov

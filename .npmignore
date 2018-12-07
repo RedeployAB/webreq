@@ -1,1 +1,4 @@
 test
+.travis.yml
+*.tgz
+.nyc_output
