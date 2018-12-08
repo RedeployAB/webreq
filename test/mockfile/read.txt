@@ -1,0 +1,1 @@
+File to read during check of stream.

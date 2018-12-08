@@ -1,7 +1,8 @@
 const { expect } = require('chai');
 const url = require('url');
+const fs = require('fs');
 
-const { createRequestOptions, parseResponseBody } = require('../lib/utils');
+const { createRequestOptions, parseResponseBody, isStream } = require('../lib/utils');
 
 describe('request-utils', () => {
 
@@ -123,6 +124,24 @@ describe('request-utils', () => {
 
       expect(parsedBody).to.be.a('string');
       expect(parsedBody).to.equal('some data')
+
+      done();
+    });
+  });
+
+  describe('isStream()', () => {
+
+    it('should return true if passed in object is a stream', (done) => {
+      let rs = fs.createReadStream(__dirname + '/mockfile/read.txt');
+      expect(isStream(rs)).to.be.true;
+      done();
+    });
+
+    it('shoul return false if passed in object is not a stream', (done) => {
+      let obj1 = {}, obj2 = 'string';
+      
+      expect(isStream(obj1)).to.be.false;
+      expect(isStream(obj2)).to.be.false;
 
       done();
     });
