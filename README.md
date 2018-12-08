@@ -25,7 +25,7 @@ It's a very great module for that purpose, if not *the* best and I highly recomm
 deeper functionality is needed. If the need is only to make basic `GET`/`POST`/`PUT` and `DELETE` requests with either `application/json`
 or `application/x-www-form-urlencoded` most other modules depends on so many other node modules and packages.
 
-`webreq` depends only on the built-in modules `http`, `https` and `url`. And the goal is to keep it that way.
+`webreq` depends only on the built-in modules. And the goal is to keep it that way.
 
 Note that this is a work in progress, and more features might, or might not be added.
 
@@ -61,6 +61,8 @@ try {
 }
 ```
 
+To target a specific port, specify it in the URL: `https://someurl:8080`.
+
 **Basic GET request using callback**
 
 ```js
@@ -88,15 +90,31 @@ webreq.method(uri, [options], [callback]);
 
 #### Options
 
-The following options can be used.
+The following properties can be set on `webreq`.
+
+```js
+// parse: Optional. Default is true. If true it will try to parse the response according to MIME type, if false will return pure string.
+webreq.parse = true|false
+// bodyOnly: Optional. Default is true. If true it will only return the response body, if false it will return a Response object, statusCode, headers and body.
+webreq.bodyOnly = true|false 
+```
+
+The following options can be used for each request.
 
 ```js
 let options = {
-    method: "GET"|"POST"|"PUT"|"DELETE", // Optional. Will default to GET.
-    headers: {}, // Optional. Depending on method used and input data is used, Content-Type and Content-Lengt will be checked and enforced.
-    body: {}, // Optional for GET requests. Mandatory for POST, PUT, PATCH. The data to send with the request.
-    parse: true|false, // Optional. Default is true. If true it will try to parse the response according to MIME type, if false will return pure string.
-    bodyOnly: true|false, // Optional. Default is true. If true it will only return the response body, if false it will return a Response object, statusCode, headers and body.
+    // method: Optional. Will default to GET.
+    method: "GET"|"POST"|"PUT"|"DELETE", 
+    // headers: Optional. Depending on method used and input data is used, Content-Type and Content-Lengt will be checked and enforced.
+    headers: {}, 
+    // body: Optional for GET requests. Mandatory for POST, PUT, PATCH. The data to send with the request.
+    body: {}, 
+    // parse: Optional. Default is true. If true it will try to parse the response according to MIME type, if false will return pure string.
+    // Overrides the settings put on webreq.
+    parse: true|false,
+    // bodyOnly: Optional. Default is true. If true it will only return the response body, if false it will return a Response object, statusCode, headers and body.
+    // Overrides the settings put on webreq.
+    bodyOnly: true|false, 
 }
 ```
 

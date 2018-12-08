@@ -211,6 +211,20 @@ describe('webreq', () => {
       done();
     });
 
+    it('should handle a POST request and parse the results (promise), handle non-string payload', (done) => {
+      let params = { foo: 'bar' };
+
+      let	request = new PassThrough();
+      let write = sinon.spy(request, 'write');
+
+      this.request.returns(request);
+
+      webreq.post('https://someurl.not', { method: 'POST', body: params}).then(() => {});
+
+      assert(write.withArgs(JSON.stringify(params)).calledOnce);
+      done();
+    });
+
     it('should handle a POST request and parse the results (callback)', (done) => {
       let params = { foo: 'bar' };
       let paramsString = JSON.stringify(params);
