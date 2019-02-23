@@ -143,6 +143,7 @@ let options = {
     // agent.maxSockets: Optional: Maximum number of sockets to allow per host.
     agent.maxSockets: Number
     // agent.maxFreeSockets: Optional: Maximum number of sockets to leave open in a free state. Only relevant if keepAlive is set to true.
+    agent.maxFreeSockets: Number
 }
 ```
 
