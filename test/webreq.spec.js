@@ -78,6 +78,34 @@ describe('webreq', () => {
         expect(res).to.eql({ data: "data" });
       });
     });
+
+    it('should handle a GET request with modified agent settings (promise)', () => {
+      let mockRes = { data: "data" };
+
+      let response = new PassThrough();
+      response.headers = { 'content-type': 'application/json'}
+      response.statusCode = 200;
+
+      response.write(JSON.stringify(mockRes));
+      response.end();
+
+      let request = new PassThrough();
+
+      this.request.callsArgWith(1, response).returns(request);
+
+      let options = {
+        agent: {
+          keepAlive: true,
+          keepAliveMsecs: 500,
+          maxSockets: 256,
+          maxFreeSockets: 256
+        }
+      };
+
+      return webreq.request('https://someurl.not', options).then(res => {
+        expect(res).to.eql({ data: "data" });
+      });
+    });
   
     it('should handle a GET request and parse the results (callback)', (done) => {
       let mockRes = { data: "data" };
@@ -583,6 +611,18 @@ describe('webreq', () => {
       });
     });
 
+  });
+
+  describe('configureGlobalAgent()', () => {
+    it('should configure the global agent settings of webreq (http/https)', () => {
+      webreq.configureGlobalAgent({ maxSockets: 200, maxFreeSockets: 256 });
+      expect(webreq.globalAgent).to.equal(0);
+    });
+
+    it('should configure the global agent settings of webreq (http/https), no settings, leave default settings', () => {
+      webreq.configureGlobalAgent();
+      expect(webreq.globalAgent).to.be.null;
+    });
   });
 
   describe('On Error', () => {

@@ -103,6 +103,15 @@ webreq.followRedirects true|false
 webreq.maxRedirects: Number
 ```
 
+To modify the `http.globalAgent` and `https.globalAgent`:
+
+```js
+// Set maxSockets for all requests.
+webreq.configureGlobalAgent({ maxSockets: 200 });
+// Set maxSockets and maxFreeSockets for all requests (only viable when keepAlive is used in that request).
+webreq.configureGlobalAgent({ maxSockets: 200, maxFreeSockets: 256 });
+```
+
 The following options can be used for each request.
 
 ```js
@@ -125,6 +134,16 @@ let options = {
     // maxRedirects: Optional. Default is 3. Maximum amount of redirects.
     // Overrides the settings put on webreq.
     maxRedirects: Number
+    // agent: Optional. Options object for agent for this request.
+    agent: Object
+    // agent.keepAlive: Optional. Keep sockets around even when there are no outstanding requests.
+    agent.keepAlive: Number
+    // agent.keepAliveMsecs: Optional. When using the keepAlive option, specifies the initial delay for TCP Keep-Alive packets.
+    agent.keepAliveMsecs: Number
+    // agent.maxSockets: Optional: Maximum number of sockets to allow per host.
+    agent.maxSockets: Number
+    // agent.maxFreeSockets: Optional: Maximum number of sockets to leave open in a free state. Only relevant if keepAlive is set to true.
+    agent.maxFreeSockets: Number
 }
 ```
 
