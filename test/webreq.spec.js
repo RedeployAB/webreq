@@ -38,6 +38,46 @@ describe('webreq', () => {
         expect(res).to.eql({ data: "data" });
       });
     });
+
+    it('should handle a GET request, follow redirect, and parse the results (promise)', () => {
+      // Define first call.
+      let mockRes = { data: "data" };
+
+      let response = new PassThrough();
+      response.headers = { 'content-type': 'application/json', 'location': 'https://someurl.not/redirect' }
+      response.statusCode = 302;
+
+      response.write(JSON.stringify(mockRes));
+      response.end();
+
+      let request = new PassThrough();
+
+      this.request.callsArgWith(1, response).returns(request);
+
+      return webreq.request('https://someurl.not', { followRedirects: true, maxRedirects: 3 }).then(res => {
+        expect(res).to.eql({ data: "data" });
+      });
+    });
+
+    it('should handle a GET request, follow redirect (and handle no location header), and parse the results (promise)', () => {
+      // Define first call.
+      let mockRes = { data: "data" };
+
+      let response = new PassThrough();
+      response.headers = { 'content-type': 'application/json' }
+      response.statusCode = 302;
+
+      response.write(JSON.stringify(mockRes));
+      response.end();
+
+      let request = new PassThrough();
+
+      this.request.callsArgWith(1, response).returns(request);
+
+      return webreq.request('https://someurl.not', { followRedirects: true, maxRedirects: 3 }).then(res => {
+        expect(res).to.eql({ data: "data" });
+      });
+    });
   
     it('should handle a GET request and parse the results (callback)', (done) => {
       let mockRes = { data: "data" };

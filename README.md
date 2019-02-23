@@ -96,7 +96,11 @@ The following properties can be set on `webreq`.
 // parse: Optional. Default is true. If true it will try to parse the response according to MIME type, if false will return pure string.
 webreq.parse = true|false
 // bodyOnly: Optional. Default is true. If true it will only return the response body, if false it will return a Response object, statusCode, headers and body.
-webreq.bodyOnly = true|false 
+webreq.bodyOnly = true|false
+// followRedirects: Optional. Default is false. If true it will follow redirects found in the 'location' header.
+webreq.followRedirects true|false
+// maxRedirects: Optional. Default is 3.
+webreq.maxRedirects: Number
 ```
 
 The following options can be used for each request.
@@ -115,6 +119,12 @@ let options = {
     // bodyOnly: Optional. Default is true. If true it will only return the response body, if false it will return a Response object, statusCode, headers and body.
     // Overrides the settings put on webreq.
     bodyOnly: true|false, 
+    // followRedirects: Optional. Default is false. If true it will follow redirects found in the 'location' header.
+    // Overrides the settings put on webreq.
+    followRedirects: true|false
+    // maxRedirects: Optional. Default is 3. Maximum amount of redirects.
+    // Overrides the settings put on webreq.
+    maxRedirects: Number
 }
 ```
 
