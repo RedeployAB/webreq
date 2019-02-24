@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0
+
+* Added support for following redirects from the `location` header. New options added: `followRedirects` and `maxRedirects`. These can
+be set on `webreq.followRedirects = true|false` and `webreq.maxRedirects = Number`, as well be passed along in `options` of a call, like so: `{ followRedirects: true, maxRedirects: 3 }`.
+* The `options` parameter accept agent settings for creating a new agent on that specific call. Supports the same parameters as the `http` and `https`
+modules own agents. See: [http.Agent](https://nodejs.org/api/http.html#http_class_http_agent).
+* Added function `configureGlobalAgent()`. Use this to set the global agent settings for all requests. Supports: `maxSockets` and `maxFreeSockets`.
+
 ## 0.2.0
 
 ### Updates

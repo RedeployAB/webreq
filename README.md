@@ -47,9 +47,9 @@ const webreq = require('webreq');
 ...
 ...
 webreq.get('https://someurl').then((res) => {
-    console.log(res);
+  console.log(res);
 }).catch(error => {
-    console.log(error);
+  console.log(error);
 });
 
 // Using Promise based inside an async function.
@@ -96,25 +96,59 @@ The following properties can be set on `webreq`.
 // parse: Optional. Default is true. If true it will try to parse the response according to MIME type, if false will return pure string.
 webreq.parse = true|false
 // bodyOnly: Optional. Default is true. If true it will only return the response body, if false it will return a Response object, statusCode, headers and body.
-webreq.bodyOnly = true|false 
+webreq.bodyOnly = true|false
+// followRedirects: Optional. Default is false. If true it will follow redirects found in the 'location' header.
+webreq.followRedirects true|false
+// maxRedirects: Optional. Default is 3.
+webreq.maxRedirects: Number
+```
+
+To modify the `http.globalAgent` and `https.globalAgent`:
+
+```js
+// Set maxSockets for all requests.
+webreq.configureGlobalAgent({ maxSockets: 200 });
+// Set maxSockets and maxFreeSockets for all requests (only viable when keepAlive is used in that request).
+webreq.configureGlobalAgent({ maxSockets: 200, maxFreeSockets: 256 });
 ```
 
 The following options can be used for each request.
 
+For more information about the agent settings, see: [http.Agent](https://nodejs.org/api/http.html#http_class_http_agent).
+
 ```js
 let options = {
-    // method: Optional. Will default to GET.
-    method: "GET"|"POST"|"PUT"|"DELETE", 
-    // headers: Optional. Depending on method used and input data is used, Content-Type and Content-Lengt will be checked and enforced.
-    headers: {}, 
-    // body: Optional for GET requests. Mandatory for POST, PUT, PATCH. The data to send with the request.
-    body: {}, 
-    // parse: Optional. Default is true. If true it will try to parse the response according to MIME type, if false will return pure string.
-    // Overrides the settings put on webreq.
-    parse: true|false,
-    // bodyOnly: Optional. Default is true. If true it will only return the response body, if false it will return a Response object, statusCode, headers and body.
-    // Overrides the settings put on webreq.
-    bodyOnly: true|false, 
+  // method: Optional. Will default to GET.
+  method: "GET"|"POST"|"PUT"|"DELETE",
+  // headers: Optional. Depending on method used and input data is used, Content-Type and Content-Lengt will be checked and enforced.
+  headers: {},
+  // body: Optional for GET requests. Mandatory for POST, PUT, PATCH. The data to send with the request.
+  body: {},
+  // parse: Optional. Default is true. If true it will try to parse the response according to MIME type, if false will return pure string.
+  // Overrides the settings put on webreq.
+  parse: true|false,
+  // bodyOnly: Optional. Default is true. If true it will only return the response body, if false it will return a Response object, statusCode, headers and body.
+  // Overrides the settings put on webreq.
+  bodyOnly: true|false,
+  // followRedirects: Optional. Default is false. If true it will follow redirects found in the 'location' header.
+  // Overrides the settings put on webreq.
+  followRedirects: true|false
+  // maxRedirects: Optional. Default is 3. Maximum amount of redirects.
+  // Overrides the settings put on webreq.
+  maxRedirects: Number
+  // agent: Optional. Options object for agent for this request.
+  agent: {
+    // keepAlive: Optional. Keep sockets around for future requests.
+    keepAlive: Number
+    // keepAliveMsecs: Optional. Specifies initial delay for Keep-Alive packets in use with the keepAlive option.
+    keepAliveMsecs: Number
+    // maxSockets: Optional: Maximum number of sockets to allow per host.
+    maxSockets: Number
+    // maxFreeSockets: Optional: Maximum number of sockets to leave open if keepAlive is true.
+    maxFreeSockets: Number
+    // timeout: Optional: Socket timeout in milliseconds.
+    timeout: Number
+  }
 }
 ```
 
@@ -125,7 +159,7 @@ If `bodyOnly` is set to true (default behaviour), it will only return the respon
 
 ```js
 webreq.get('https://someurl', { bodyOnly: true, parse: true }).then(res => {
-    console.log(res);  // { message: 'hello' } - object 
+  console.log(res);  // { message: 'hello' } - object
 });
 ```
 
@@ -133,9 +167,9 @@ If it's set to `false` it will return a `Response` object containing `statusCode
 
 ```js
 webreq.get('https://someurl', { bodyOnly: false, parse: true }).then(res => {
-    console.log(res.statusCode);    // 200                                      - number
-    console.log(res.headers);       // { 'content-type': 'application/json' }   - object
-    console.log(res.body);          // { message: 'hello' }                     - object 
+  console.log(res.statusCode);    // 200                                      - number
+  console.log(res.headers);       // { 'content-type': 'application/json' }   - object
+  console.log(res.body);          // { message: 'hello' }                     - object
 });
 ```
 
@@ -144,7 +178,7 @@ The example above shows this behaviour.
 
 ```js
 webreq.get('https://someurl', { bodyOnly: true, parse: false }).then(res => {
-    console.log(res);  // '{"message":'hello'}" - string
+  console.log(res);  // '{"message":'hello'}" - string
 });
 ```
 
@@ -152,9 +186,9 @@ If it's set to `false` it will attempt to parse the body.
 
 ```js
 webreq.get('https://someurl', { bodyOnly: false, parse: false }).then(res => {
-    console.log(res.statusCode);    // 200                                      - number
-    console.log(res.headers);       // { 'content-type': 'application/json' }   - object
-    console.log(res.body);          // '{"message":'hello'}"                    - string
+  console.log(res.statusCode);    // 200                                      - number
+  console.log(res.headers);       // { 'content-type': 'application/json' }   - object
+  console.log(res.body);          // '{"message":'hello'}"                    - string
 });
 ```
 
@@ -168,14 +202,14 @@ const webreq = require('webreq');
 ...
 ...
 let options = {
-    method: 'GET',
-    headers: { Authorization: `bearer ${token}` }
+  method: 'GET',
+  headers: { Authorization: `bearer ${token}` }
 };
 
 webreq.request('https://someurl', options).then(res => {
-    console.log(res);
+  console.log(res);
 }).catch(err => {
-    console.log(err);
+  console.log(err);
 });
 ```
 
@@ -186,15 +220,15 @@ const webreq = require('webreq');
 ...
 ...
 let options = {
-    method: 'POST',
-    headers: { Authorization: `bearer ${token}`, 'Content-Type': 'application/json' },
-    body: '{"property1":"value1"}'
+  method: 'POST',
+  headers: { Authorization: `bearer ${token}`, 'Content-Type': 'application/json' },
+  body: '{"property1":"value1"}'
 };
 
 webreq.request('https://someurl', options).then(res => {
-    console.log(res);
+  console.log(res);
 }).catch(err => {
-    console.log(err);
+  console.log(err);
 });
 ```
 
@@ -205,15 +239,15 @@ const webreq = require('webreq');
 ...
 ...
 let options = {
-    method: 'PUT',
-    headers: { Authorization: `bearer ${token}`, 'Content-Type': 'application/json' },
-    body: '{"property1":"value1"}'
+  method: 'PUT',
+  headers: { Authorization: `bearer ${token}`, 'Content-Type': 'application/json' },
+  body: '{"property1":"value1"}'
 };
 
 webreq.request('https://someurl/id/1', options).then(res => {
-    console.log(res);
+  console.log(res);
 }).catch(err => {
-    console.log(err);
+  console.log(err);
 });
 ```
 
@@ -224,14 +258,14 @@ const webreq = require('webreq');
 ...
 ...
 let options = {
-    method: 'DELETE',
-    headers: { Authorization: `bearer ${token}` }
+  method: 'DELETE',
+  headers: { Authorization: `bearer ${token}` }
 };
 
 webreq.request('https://someurl/id/1', options).then(res => {
-    console.log(res);
+  console.log(res);
 }).catch(err => {
-    console.log(err);
+  console.log(err);
 });
 ```
 
