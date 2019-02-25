@@ -9,6 +9,7 @@ Small and simple module for handling HTTP/HTTPS requests.
 * [Install](#install)
 * [Usage](#usage)
   * [Methods](#options-and-methods)
+  * [File downloads](#file-downloads)
 * [Todo](#todo)
 
 ## Information
@@ -93,12 +94,14 @@ webreq.method(uri, [options], [callback]);
 The following properties can be set on `webreq`.
 
 ```js
+// stream: Optional. Default is false. If true it will return the response as a stream.
+webreq.stream = Boolean
 // parse: Optional. Default is true. If true it will try to parse the response according to MIME type, if false will return pure string.
-webreq.parse = true|false
+webreq.parse = Boolean
 // bodyOnly: Optional. Default is true. If true it will only return the response body, if false it will return a Response object, statusCode, headers and body.
-webreq.bodyOnly = true|false
+webreq.bodyOnly = Boolean
 // followRedirects: Optional. Default is false. If true it will follow redirects found in the 'location' header.
-webreq.followRedirects true|false
+webreq.followRedirects Boolean
 // maxRedirects: Optional. Default is 3.
 webreq.maxRedirects: Number
 ```
@@ -122,17 +125,19 @@ let options = {
   method: "GET"|"POST"|"PUT"|"DELETE",
   // headers: Optional. Depending on method used and input data is used, Content-Type and Content-Lengt will be checked and enforced.
   headers: {},
+  // stream: Optional. Returns response as a stream.
+  stream: Boolean,
   // body: Optional for GET requests. Mandatory for POST, PUT, PATCH. The data to send with the request.
   body: {},
   // parse: Optional. Default is true. If true it will try to parse the response according to MIME type, if false will return pure string.
   // Overrides the settings put on webreq.
-  parse: true|false,
+  parse: Boolean,
   // bodyOnly: Optional. Default is true. If true it will only return the response body, if false it will return a Response object, statusCode, headers and body.
   // Overrides the settings put on webreq.
-  bodyOnly: true|false,
+  bodyOnly: Boolean,
   // followRedirects: Optional. Default is false. If true it will follow redirects found in the 'location' header.
   // Overrides the settings put on webreq.
-  followRedirects: true|false
+  followRedirects: Boolean
   // maxRedirects: Optional. Default is 3. Maximum amount of redirects.
   // Overrides the settings put on webreq.
   maxRedirects: Number
@@ -311,7 +316,46 @@ Uses `request()` but enforces `method: DELETE` in it's options.
 webreq.delete(uri, [options], [callback]);
 ```
 
+### File downloads
+
+There are a couple of options of handling file downloads.
+
+1. Specify path in a `GET` request:
+```js
+// Will return status codes and headers, but a null body.
+webreq.request('https://someurl/files/file1.txt', { method: 'GET', path: 'path/to/files', bodyOnly: false })
+  .then(res => {
+    console.log(res);
+  })
+  .catch(err => {
+    console.log(res);
+  });
+```
+2. Specify path and new filename in a `GET` request:
+```js
+// Will return status codes and headers, but a null body.
+webreq.request('https://someurl/files/file1.txt', { method: 'GET', path: 'path/to/files', filename: 'newname.txt', bodyOnly: false })
+  .then(res => {
+    console.log(res);
+  })
+  .catch(err => {
+    console.log(res);
+  });
+```
+3. As a stream, to pipe to other stream.
+```js
+const fs = require('fs');
+// Will return status codes and headers, but a null body.
+webreq.request('https://someurl/files/file1.txt', { method: 'GET', stream: true })
+  .then(res => {
+    res.pipe(fs.createFileStream('/path/to/files/file.txt'));
+  })
+  .catch(err => {
+    console.log(res);
+  });
+```
+
 ## Todo
 
 * Test `PATCH`.
-* Add file upload/download functionality.
+* Add file upload functionality.

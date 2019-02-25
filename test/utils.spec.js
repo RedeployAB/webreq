@@ -9,7 +9,7 @@ describe('request-utils', () => {
   describe('createRequestOptions()', () => {
 
     it('should parse hostname, port, path and headers (HTTPS default to 443, default to GET)', (done) => {
-    
+
       let parsedUrl = url.parse('https://codecloudandrants.io');
       let requestOptions = createRequestOptions(parsedUrl);
 
@@ -93,7 +93,7 @@ describe('request-utils', () => {
     });
 
     it('should try to parse the response as JSON (return JSON object) if Content-Type (application/json) is present', (done) => {
-      let headers = {'content-type': 'application/json'};
+      let headers = { 'content-type': 'application/json' };
       let str = '{"data":"some data"}';
       let buf = Buffer.from(str, 'utf8');
       let parsedBody = parseResponseBody(headers, [buf]);
@@ -105,7 +105,7 @@ describe('request-utils', () => {
     });
 
     it('should try to parse the response as plain text (return string) if Content-Type (text/html) is present', (done) => {
-      let headers = {'content-type': 'text/html'};
+      let headers = { 'content-type': 'text/html' };
       let str = 'some data';
       let buf = Buffer.from(str, 'utf8');
       let parsedBody = parseResponseBody(headers, [buf]);
@@ -117,7 +117,7 @@ describe('request-utils', () => {
     });
 
     it('should try to parse the response as plain text (return string) if Content-Type (other) is present', (done) => {
-      let headers = {'content-type': 'text/plain'};
+      let headers = { 'content-type': 'text/plain' };
       let str = 'some data';
       let buf = Buffer.from(str, 'utf8');
       let parsedBody = parseResponseBody(headers, [buf]);
@@ -139,7 +139,7 @@ describe('request-utils', () => {
 
     it('shoul return false if passed in object is not a stream', (done) => {
       let obj1 = {}, obj2 = 'string';
-      
+
       expect(isStream(obj1)).to.be.false;
       expect(isStream(obj2)).to.be.false;
 
