@@ -4,6 +4,10 @@ const { PassThrough } = require('stream');
 const https = require('https');
 const http = require('http');
 const assert = require('assert');
+const Stream = require('stream');
+
+const fs = require('fs');
+const path = require('path');
 
 const webreq = require('../lib/webreq');
 
@@ -650,10 +654,10 @@ describe('webreq', () => {
       https.request.restore();
     });
 
-    it('should handle errors (promise)', (done) => {
-      var mockError = 'An error has occured';
-      var request = new PassThrough();
+    it('should handle errors on request (promise)', (done) => {
+      let mockError = 'An error has occured';
 
+      let request = new PassThrough();
       this.request.returns(request);
 
       webreq.request('https://someurl.not').then(res => {
@@ -695,5 +699,144 @@ describe('webreq', () => {
         expect(res).to.eql({ data: "data" });
       });
     });
+  });
+
+  describe('request() - File download', () => {
+    beforeEach(() => {
+      this.request = sinon.stub(https, 'request');
+    });
+
+    afterEach(() => {
+      https.request.restore();
+    });
+
+    it('should handle a GET request with file download (promise)', () => {
+      let file = fs.readFileSync(path.join(__dirname, 'mockdata', 'file1.zip'));
+
+      let response = new PassThrough();
+      response.headers = { 'content-type': 'application/zip', 'content-disposition': 'attachment; filename=file1.zip' };
+      response.statusCode = 200;
+
+      response.write(file);
+      response.end();
+
+      let request = new PassThrough();
+
+      this.request.callsArgWith(1, response).returns(request);
+
+      let outputPath = path.join(__dirname, 'mockdata', 'output');
+      let filename = 'file1.zip';
+
+      return webreq.request('https://someurl.not', { path: outputPath }).then(res => {
+        expect(res).to.be.null;
+        expect(fs.existsSync(path.join(outputPath, filename))).to.be.true;
+        fs.unlinkSync(path.join(outputPath, filename));
+      });
+    });
+
+    it('should handle a GET request with file upload (promise), full response', () => {
+      let file = fs.readFileSync(path.join(__dirname, 'mockdata', 'file2.zip'));
+
+      let response = new PassThrough();
+      response.headers = { 'content-type': 'application/zip', 'content-disposition': 'attachment; filename=file2.zip' };
+      response.statusCode = 200;
+
+      response.write(file);
+      response.end();
+
+      let request = new PassThrough();
+
+      this.request.callsArgWith(1, response).returns(request);
+
+      let outputPath = path.join(__dirname, 'mockdata', 'output');
+      let filename = 'file2.zip';
+
+      return webreq.request('https://someurl.not', { path: outputPath, bodyOnly: false }).then(res => {
+        expect(res.statusCode).to.equal(200);
+        expect(res.body).to.be.null;
+        expect(fs.existsSync(path.join(outputPath, filename))).to.be.true;
+        fs.unlinkSync(path.join(outputPath, filename));
+      });
+    });
+
+    it('should handle a GET request with file upload (promise), get name from options', () => {
+      let file = fs.readFileSync(path.join(__dirname, 'mockdata', 'file3.zip'));
+
+      let response = new PassThrough();
+      response.headers = { 'content-type': 'application/zip', 'content-disposition': 'attachment; filename=file3.zip' };
+      response.statusCode = 200;
+
+      response.write(file);
+      response.end();
+
+      let request = new PassThrough();
+
+      this.request.callsArgWith(1, response).returns(request);
+
+      let outputPath = path.join(__dirname, 'mockdata', 'output');
+      let filename = 'file3.zip';
+
+      return webreq.request('https://someurl.not', { path: outputPath, filename: filename, bodyOnly: false }).then(res => {
+        expect(res.statusCode).to.equal(200);
+        expect(res.body).to.be.null;
+        expect(fs.existsSync(path.join(outputPath, filename))).to.be.true;
+        fs.unlinkSync(path.join(outputPath, filename));
+      });
+    });
+
+    it('should handle a GET request with file upload (promise), get name from URI path', () => {
+      let file = fs.readFileSync(path.join(__dirname, 'mockdata', 'file4.zip'));
+
+      let response = new PassThrough();
+      response.headers = { 'content-type': 'application/zip' };
+      response.statusCode = 200;
+
+      response.write(file);
+      response.end();
+
+      let request = new PassThrough();
+
+      this.request.callsArgWith(1, response).returns(request);
+
+      let outputPath = path.join(__dirname, 'mockdata', 'output');
+      let filename = 'file4.zip';
+
+      return webreq.request('https://someurl.not/file4.zip', { path: outputPath, bodyOnly: false }).then(res => {
+        expect(res.statusCode).to.equal(200);
+        expect(res.body).to.be.null;
+        expect(fs.existsSync(path.join(outputPath, filename))).to.be.true;
+        fs.unlinkSync(path.join(outputPath, filename));
+      });
+    });
+  });
+
+  describe('request() - Response as a stream', () => {
+    beforeEach(() => {
+      this.request = sinon.stub(https, 'request');
+    });
+
+    afterEach(() => {
+      https.request.restore();
+    });
+
+    it('should return the response as a stream', () => {
+      let mockRes = { data: "data" };
+
+      let response = new PassThrough();
+      response.headers = { 'content-type': 'application/json' }
+      response.statusCode = 200;
+
+      response.write(JSON.stringify(mockRes));
+      response.end();
+
+      let request = new PassThrough();
+
+      this.request.callsArgWith(1, response).returns(request);
+
+      return webreq.request('https://someurl.not', { method: 'GET', stream: true })
+        .then(res => {
+          expect(res instanceof Stream)
+        });
+    })
   });
 });

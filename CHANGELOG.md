@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.0
+
+* Added support for file downloads. Uses `path` and `filename`, specified in `options`.
+* Added support for getting response as a stream. Uses `stream`, specified in `options`.
+
 ## 0.3.0
 
 * Added support for following redirects from the `location` header. New options added: `followRedirects` and `maxRedirects`. These can
