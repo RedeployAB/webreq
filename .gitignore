@@ -22,6 +22,8 @@ node_modules
 build/
 .nyc_output
 test-results.xml
-webreq*.tgz
+*.tgz
 coverage
 *.lcov
+test/mockdata/output
+lib/mappings
