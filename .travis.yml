@@ -2,7 +2,7 @@ if: tag IS present
 
 language: node_js
 node_js:
-  - "8"
+  - "8.5"
 
 install:
   - npm install
