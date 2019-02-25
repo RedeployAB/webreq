@@ -725,7 +725,9 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       let outputPath = path.join(__dirname, 'mockdata', 'output');
-      let filename = 'file1.zip';
+      if (!fs.existsSync(outputPath)){
+        fs.mkdirSync(outputPath);
+      }
 
       return webreq.request('https://someurl.not', { path: outputPath }).then(res => {
         expect(res).to.be.null;
@@ -747,7 +749,10 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       let outputPath = path.join(__dirname, 'mockdata', 'output');
-      let filename = 'file2.zip';
+
+      if (!fs.existsSync(outputPath)){
+        fs.mkdirSync(outputPath);
+      }
 
       return webreq.request('https://someurl.not', { path: outputPath, bodyOnly: false }).then(res => {
         expect(res.statusCode).to.equal(200);
@@ -772,6 +777,10 @@ describe('webreq', () => {
       let outputPath = path.join(__dirname, 'mockdata', 'output');
       let filename = 'file3.zip';
 
+      if (!fs.existsSync(outputPath)){
+        fs.mkdirSync(outputPath);
+      }
+
       return webreq.request('https://someurl.not', { path: outputPath, filename: filename, bodyOnly: false }).then(res => {
         expect(res.statusCode).to.equal(200);
         expect(res.body).to.be.null;
@@ -793,7 +802,10 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       let outputPath = path.join(__dirname, 'mockdata', 'output');
-      let filename = 'file4.zip';
+
+      if (!fs.existsSync(outputPath)){
+        fs.mkdirSync(outputPath);
+      }
 
       return webreq.request('https://someurl.not/file4.zip', { path: outputPath, bodyOnly: false }).then(res => {
         expect(res.statusCode).to.equal(200);
@@ -801,7 +813,7 @@ describe('webreq', () => {
       });
     });
 
-/*     it('should have produced output files in previous tests', (done) => {
+    it('should have produced output files in previous tests', (done) => {
       let outputPath = path.join(__dirname, 'mockdata', 'output');
       let file1 = path.join(outputPath, 'file1.zip');
       let file2 = path.join(outputPath, 'file2.zip');
@@ -817,7 +829,7 @@ describe('webreq', () => {
       fs.unlinkSync(file3);
       fs.unlinkSync(file4);
       done();
-    }); */
+    });
   });
 
   describe('request() - Response as a stream', () => {
