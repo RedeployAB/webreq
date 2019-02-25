@@ -729,13 +729,11 @@ describe('webreq', () => {
 
       return webreq.request('https://someurl.not', { path: outputPath }).then(res => {
         expect(res).to.be.null;
-        expect(fs.existsSync(path.join(outputPath, filename))).to.be.true;
-        fs.unlinkSync(path.join(outputPath, filename));
       });
     });
 
     it('should handle a GET request with file upload (promise), full response', () => {
-      let file = fs.readFileSync(path.join(__dirname, 'mockdata', 'file2.zip'));
+      let file = fs.readFileSync(path.join(__dirname, 'mockdata', 'file1.zip'));
 
       let response = new PassThrough();
       response.headers = { 'content-type': 'application/zip', 'content-disposition': 'attachment; filename=file2.zip' };
@@ -754,13 +752,11 @@ describe('webreq', () => {
       return webreq.request('https://someurl.not', { path: outputPath, bodyOnly: false }).then(res => {
         expect(res.statusCode).to.equal(200);
         expect(res.body).to.be.null;
-        expect(fs.existsSync(path.join(outputPath, filename))).to.be.true;
-        fs.unlinkSync(path.join(outputPath, filename));
       });
     });
 
     it('should handle a GET request with file upload (promise), get name from options', () => {
-      let file = fs.readFileSync(path.join(__dirname, 'mockdata', 'file3.zip'));
+      let file = fs.readFileSync(path.join(__dirname, 'mockdata', 'file1.zip'));
 
       let response = new PassThrough();
       response.headers = { 'content-type': 'application/zip', 'content-disposition': 'attachment; filename=file3.zip' };
@@ -779,13 +775,11 @@ describe('webreq', () => {
       return webreq.request('https://someurl.not', { path: outputPath, filename: filename, bodyOnly: false }).then(res => {
         expect(res.statusCode).to.equal(200);
         expect(res.body).to.be.null;
-        expect(fs.existsSync(path.join(outputPath, filename))).to.be.true;
-        fs.unlinkSync(path.join(outputPath, filename));
       });
     });
 
     it('should handle a GET request with file upload (promise), get name from URI path', () => {
-      let file = fs.readFileSync(path.join(__dirname, 'mockdata', 'file4.zip'));
+      let file = fs.readFileSync(path.join(__dirname, 'mockdata', 'file1.zip'));
 
       let response = new PassThrough();
       response.headers = { 'content-type': 'application/zip' };
@@ -804,9 +798,25 @@ describe('webreq', () => {
       return webreq.request('https://someurl.not/file4.zip', { path: outputPath, bodyOnly: false }).then(res => {
         expect(res.statusCode).to.equal(200);
         expect(res.body).to.be.null;
-        expect(fs.existsSync(path.join(outputPath, filename))).to.be.true;
-        fs.unlinkSync(path.join(outputPath, filename));
       });
+    });
+
+    it('should have produced output files in previous tests', (done) => {
+      let outputPath = path.join(__dirname, 'mockdata', 'output');
+      let file1 = path.join(outputPath, 'file1.zip');
+      let file2 = path.join(outputPath, 'file2.zip');
+      let file3 = path.join(outputPath, 'file3.zip');
+      let file4 = path.join(outputPath, 'file4.zip');
+
+      expect(fs.existsSync(file1)).to.be.true;
+      expect(fs.existsSync(file2)).to.be.true;
+      expect(fs.existsSync(file3)).to.be.true;
+      expect(fs.existsSync(file4)).to.be.true;
+      fs.unlinkSync(file1);
+      fs.unlinkSync(file2);
+      fs.unlinkSync(file3);
+      fs.unlinkSync(file4);
+      done();
     });
   });
 
