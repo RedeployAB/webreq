@@ -801,7 +801,7 @@ describe('webreq', () => {
       });
     });
 
-    it('should have produced output files in previous tests', (done) => {
+/*     it('should have produced output files in previous tests', (done) => {
       let outputPath = path.join(__dirname, 'mockdata', 'output');
       let file1 = path.join(outputPath, 'file1.zip');
       let file2 = path.join(outputPath, 'file2.zip');
@@ -817,7 +817,7 @@ describe('webreq', () => {
       fs.unlinkSync(file3);
       fs.unlinkSync(file4);
       done();
-    });
+    }); */
   });
 
   describe('request() - Response as a stream', () => {
