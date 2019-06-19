@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0
+
+* Added support for providing certificate options with HTTPS requests. See further documentation: [https](https://nodejs.org/api/https.html#https_https_request_options_callback) and [tls](https://nodejs.org/api/tls.html#tls_tls_connect_options_callback).
+* `bodyOnly` options has been removed. This means by all responses will be of type `Response` (`statusCode`, `headers` and `body`).
+* Added **TypeScript** declaration in `lib/types`.
+* Changed function name from `configureGlobalAgent()` to `globalAgent()`.
+
 ## 0.4.0
 
 * Added support for file downloads. Uses `path` and `filename`, specified in `options`.
