@@ -27,3 +27,5 @@ coverage
 *.lcov
 test/mockdata/output
 lib/mappings
+*.bak
+.DS_Store
