@@ -8,7 +8,7 @@ describe('request-utils', () => {
 
   describe('createRequestOptions()', () => {
 
-    it('should parse hostname, port, path and headers (HTTPS default to 443, default to GET)', (done) => {
+    it('should parse hostname, port, path and headers (HTTPS default to 443, default to GET)', () => {
 
       let parsedUrl = url.parse('https://codecloudandrants.io');
       let requestOptions = createRequestOptions(parsedUrl);
@@ -18,11 +18,9 @@ describe('request-utils', () => {
       expect(requestOptions.path).to.equal('/');
       expect(requestOptions.method).to.equal('GET');
       expect(requestOptions.headers).to.be.undefined;
-
-      done();
     });
 
-    it('should parse should parse hostname, port, path, method and headers (with port in url)', (done) => {
+    it('should parse should parse hostname, port, path, method and headers (with port in url)', () => {
 
       let options = { method: 'POST', headers: { 'Content-Type': 'application/json' } };
       let parsedUrl = url.parse('https://codecloudandrants.io:8443/a-path?istrue=true');
@@ -33,11 +31,9 @@ describe('request-utils', () => {
       expect(requestOptions.path).to.equal('/a-path?istrue=true');
       expect(requestOptions.method).to.equal('POST');
       expect(requestOptions.headers).to.be.an('Object');
-
-      done();
     });
 
-    it('should parse hostname, port, path and headers (HTTP default to 80)', (done) => {
+    it('should parse hostname, port, path and headers (HTTP default to 80)', () => {
 
       let parsedUrl = url.parse('http://codecloudandrants.io');
       let requestOptions = createRequestOptions(parsedUrl);
@@ -47,11 +43,9 @@ describe('request-utils', () => {
       expect(requestOptions.path).to.equal('/');
       expect(requestOptions.method).to.equal('GET');
       expect(requestOptions.headers).to.be.undefined;
-
-      done();
     });
 
-    it('should parse hostname, port, path and headers (with port in URL)', (done) => {
+    it('should parse hostname, port, path and headers (with port in URL)', () => {
 
       let parsedUrl = url.parse('http://codecloudandrants.io:8080');
       let requestOptions = createRequestOptions(parsedUrl);
@@ -61,14 +55,27 @@ describe('request-utils', () => {
       expect(requestOptions.path).to.equal('/');
       expect(requestOptions.method).to.equal('GET');
       expect(requestOptions.headers).to.be.undefined;
+    });
 
-      done();
+    it('should add additional ssl/cert options if protocol is https and they are provided in options.certificate', () => {
+
+      let options = { method: 'POST', headers: { 'Content-Type': 'application/json' }, certificate: { ca: 'pathToCert' }};
+      let parsedUrl = url.parse('https://codecloudandrants.io');
+
+      let requestOptions = createRequestOptions(parsedUrl, options);
+
+      expect(requestOptions.hostname).to.equal('codecloudandrants.io');
+      expect(requestOptions.port).to.equal(443);
+      expect(requestOptions.path).to.equal('/');
+      expect(requestOptions.method).to.equal('POST');
+      expect(requestOptions.headers).to.be.an('Object');
+      expect(requestOptions.ca).to.equal('pathToCert');
     });
   });
 
   describe('parseResponseBody()', () => {
 
-    it('should try to parse the response as JSON (return JSON object) if no Content-Type is present', (done) => {
+    it('should try to parse the response as JSON (return JSON object) if no Content-Type is present', () => {
       let headers = {};
       let str = '{"data":"some data"}';
       let buf = Buffer.from(str, 'utf8');
@@ -76,11 +83,9 @@ describe('request-utils', () => {
 
       expect(parsedBody).to.be.an('Object');
       expect(parsedBody.data).equal('some data');
-
-      done();
     });
 
-    it('should try to parse the response as JSON (return string) if no Content-Type is present', (done) => {
+    it('should try to parse the response as JSON (return string) if no Content-Type is present', () => {
       let headers = {};
       let str = 'some data';
       let buf = Buffer.from(str, 'utf8');
@@ -88,11 +93,9 @@ describe('request-utils', () => {
 
       expect(parsedBody).to.be.a('string');
       expect(parsedBody).to.equal('some data')
-
-      done();
     });
 
-    it('should try to parse the response as JSON (return JSON object) if Content-Type (application/json) is present', (done) => {
+    it('should try to parse the response as JSON (return JSON object) if Content-Type (application/json) is present', () => {
       let headers = { 'content-type': 'application/json' };
       let str = '{"data":"some data"}';
       let buf = Buffer.from(str, 'utf8');
@@ -100,11 +103,9 @@ describe('request-utils', () => {
 
       expect(parsedBody).to.be.an('Object');
       expect(parsedBody.data).equal('some data');
-
-      done();
     });
 
-    it('should try to parse the response as plain text (return string) if Content-Type (text/html) is present', (done) => {
+    it('should try to parse the response as plain text (return string) if Content-Type (text/html) is present', () => {
       let headers = { 'content-type': 'text/html' };
       let str = 'some data';
       let buf = Buffer.from(str, 'utf8');
@@ -112,11 +113,9 @@ describe('request-utils', () => {
 
       expect(parsedBody).to.be.a('string');
       expect(parsedBody).to.equal('some data')
-
-      done();
     });
 
-    it('should try to parse the response as plain text (return string) if Content-Type (other) is present', (done) => {
+    it('should try to parse the response as plain text (return string) if Content-Type (other) is present', () => {
       let headers = { 'content-type': 'text/plain' };
       let str = 'some data';
       let buf = Buffer.from(str, 'utf8');
@@ -124,26 +123,21 @@ describe('request-utils', () => {
 
       expect(parsedBody).to.be.a('string');
       expect(parsedBody).to.equal('some data')
-
-      done();
     });
   });
 
   describe('isStream()', () => {
 
-    it('should return true if passed in object is a stream', (done) => {
+    it('should return true if passed in object is a stream', () => {
       let rs = fs.createReadStream(__dirname + '/mockfile/read.txt');
       expect(isStream(rs)).to.be.true;
-      done();
     });
 
-    it('shoul return false if passed in object is not a stream', (done) => {
+    it('shoul return false if passed in object is not a stream', () => {
       let obj1 = {}, obj2 = 'string';
 
       expect(isStream(obj1)).to.be.false;
       expect(isStream(obj2)).to.be.false;
-
-      done();
     });
   });
 });
