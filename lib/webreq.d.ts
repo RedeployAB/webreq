@@ -1,5 +1,3 @@
-import webreq = require('./webreq');
-
 interface Buffer {}
 
 class Response {
@@ -166,7 +164,9 @@ declare class WebReq {
     globalAgent(options: object): void;
 }
 
-export let webreq = new WebReq();
+//export let webreq = webreq;
+let webreq = new WebReq();
+export = webreq;
 export let Agent = Agent;
 export let Certificate = Certificate;
 export let RequestOptions = RequestOptions;

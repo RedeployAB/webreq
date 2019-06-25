@@ -2,7 +2,7 @@
   "name": "webreq",
   "version": "0.5.0",
   "description": "Small and simple module for handling HTTP/HTTPS requests.",
-  "main": "./lib/webreq.js",
+  "main": "lib/webreq.js",
   "scripts": {
     "test": "nyc mocha --timeout 10000",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
@@ -31,5 +31,5 @@
   "engines": {
     "node": ">=8.5.0"
   },
-  "types": "lib/types/webreq.d.ts"
+  "types": "lib/webreq.d.ts"
 }
