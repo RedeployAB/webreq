@@ -33,6 +33,32 @@ describe('request-utils', () => {
       expect(requestOptions.headers).to.be.an('Object');
     });
 
+    it('should set Content-Length header if a body is in the options without Content-Length', () => {
+
+      let options = { method: 'POST', body: '{"data":"somedata"}' };
+      let parsedUrl = url.parse('https://codecloudandrants.io:8443/a-path?istrue=true');
+      let requestOptions = createRequestOptions(parsedUrl, options);
+
+      expect(requestOptions.hostname).to.equal('codecloudandrants.io');
+      expect(requestOptions.port).to.equal(8443);
+      expect(requestOptions.path).to.equal('/a-path?istrue=true');
+      expect(requestOptions.method).to.equal('POST');
+      expect(requestOptions.headers).to.be.an('Object');
+    });
+
+    it('should set Content-Length header if a body is in the options with Content-Length', () => {
+
+      let options = { method: 'POST', body: '{"data":"somedata"}', headers: {'Content-Length': 19 } };
+      let parsedUrl = url.parse('https://codecloudandrants.io:8443/a-path?istrue=true');
+      let requestOptions = createRequestOptions(parsedUrl, options);
+
+      expect(requestOptions.hostname).to.equal('codecloudandrants.io');
+      expect(requestOptions.port).to.equal(8443);
+      expect(requestOptions.path).to.equal('/a-path?istrue=true');
+      expect(requestOptions.method).to.equal('POST');
+      expect(requestOptions.headers).to.be.an('Object');
+    });
+
     it('should parse hostname, port, path and headers (HTTP default to 80)', () => {
 
       let parsedUrl = url.parse('http://codecloudandrants.io');
