@@ -129,6 +129,27 @@ describe('webreq', () => {
       });
     });
 
+    it('should handle a GET request with modified agent settings (false) (promise)', () => {
+      let mockRes = { data: "data" };
+
+      let response = new PassThrough();
+      response.headers = { 'content-type': 'application/json' }
+      response.statusCode = 200;
+
+      response.write(JSON.stringify(mockRes));
+      response.end();
+
+      let request = new PassThrough();
+
+      this.request.callsArgWith(1, response).returns(request);
+
+      let options = { agent: false };
+
+      return webreq.request('https://someurl.not', options).then(res => {
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json' }, body: { data: "data" }});
+      });
+    });
+
     it('should handle a GET request and parse the results (callback)', (done) => {
       let mockRes = { data: "data" };
       let response = new PassThrough();
