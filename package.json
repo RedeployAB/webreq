@@ -30,6 +30,5 @@
   },
   "engines": {
     "node": ">=8.5.0"
-  },
-  "types": "lib/webreq.d.ts"
+  }
 }
