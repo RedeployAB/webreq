@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { PassThrough } = require('stream');
+const { PassThrough, Readable } = require('stream');
 const https = require('https');
 const http = require('http');
 const assert = require('assert');
@@ -899,5 +899,56 @@ describe('webreq', () => {
           expect(res instanceof Stream)
         });
     })
+  });
+
+  describe('stream as body', () => {
+    beforeEach(() => {
+      this.request = sinon.stub(https, 'request');
+    });
+
+    afterEach(() => {
+      https.request.restore();
+    });
+
+    it('should write stream to request body', (done) => {
+      let request = new PassThrough()
+      let write = sinon.spy(request, 'write');
+      let end = sinon.spy(request, 'end');
+
+      this.request.returns(request);
+
+      // Fake readable stream with mock data.
+      let rs = new Readable();
+      rs._read = () => {};
+      rs.push(Buffer.from('Test data'));
+      rs.push(null);
+
+      let contentLength = rs._readableState.length;
+      webreq.request('https://someurl.not/a-stream', { method: 'PUT', body: rs, headers: { 'Content-Length': contentLength }}).then(() => {});
+      
+      // Due to the nature of streams, time out is used here.
+      setTimeout(() => {
+        assert(write.called);
+        assert(end.called);
+        done();
+      }, 10);     
+    });
+
+    it('should read a file into stream and use as body when path is used with POST/PUT', (done) => {
+      let request = new PassThrough()
+      let write = sinon.spy(request, 'write');
+      let end = sinon.spy(request, 'end');
+
+      this.request.returns(request);
+
+      webreq.request('https://someurl.not/a-stream', { method: 'POST', path: __dirname + '/mockdata/test.txt'}).then(() => {});
+      
+      // Due to the nature of streams, time out is used here.
+      setTimeout(() => {
+        assert(write.called);
+        assert(end.called);
+        done();
+      }, 10);  
+    });
   });
 });
