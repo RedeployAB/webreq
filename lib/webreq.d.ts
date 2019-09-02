@@ -119,7 +119,7 @@ interface Buffer {}
 
 declare namespace WebReq {
 
-    declare class Response {
+    class Response {
         /** Status code of the response */
         statusCode: number;
         /** Headers of the response */
@@ -128,33 +128,7 @@ declare namespace WebReq {
         body: string|object;
     }
 
-    declare interface Agent {
-        /** Keep sockets around for future requests. */
-        keepAlive?: boolean;
-        /** Specifies initial delay for Keep-Alive packets in use with the keepAlive option. */
-        keepAliveMsecs?: number;
-        /**  Maximum number of sockets to allow per host. */
-        maxSockets?: number;
-        /** Maximum number of sockets to leave open if keepAlive is true. */
-        maxFreeSockets?: number;
-        /** Socket timeout in milliseconds. */
-        timeout?: number;
-    }
-
-    declare interface Certificate {
-        /** Override the trusted CA certificates. */
-        ca?: string[] | Buffer[];
-        /** Certificate chains in PEM format. */
-        cert?: string | string[] | Buffer | Buffer[];
-        /** Private keys in PEM format. If encrypted use together with passphrase. */
-        key?: string | string[] | Buffer | Buffer[];
-        /** Shared passphrase for a private key and/or PFX. */
-        passphrase?: string;
-        /** PFX pr PKCS12 encoded private key and certificate chain. */
-        pfx?: string[] | Buffer[];
-    }
-
-    declare interface RequestOptions  {
+    interface RequestOptions  {
         /** HTTP method of the request. Default is GET. */
         method?: string;
         /** Headers of the request. */
@@ -167,16 +141,9 @@ declare namespace WebReq {
         followRedirects?: boolean;
         /** Maximum amount of redirects. */
         maxRedirects?: number;
-        /** When used in a GET request for downloads, it is used as the output path for a file. */
+        /** When used in a GET request for downloads, it is used as the output path for a file. When used with POST or PUT it will point to a file to upload. */
         path?: string;
-        /**
-         * Options object for agent for this request.
-         * @param {boolean} [keepAlive] Keep sockets around for future requests.
-         * @param {number} [keepAliveMsecs] Specifies initial delay for Keep-Alive packets in use with the keepAlive option.
-         * @param {number} [maxSockets] Maximum number of sockets to allow per host.
-         * @param {number} [maxFreeSockets] Maximum number of sockets to leave open if keepAlive is true.
-         * @param {number} [timeout] Socket timeout in milliseconds.
-         */
+        /** http.Agent/https.Agent object. */
         agent?: Agent;
         /**
          * Certificate options for the request.
@@ -187,6 +154,23 @@ declare namespace WebReq {
          * @param {string[] | Buffer[]} [pfx] PFX pr PKCS12 encoded private key and certificate chain.
          */
         certificate?: Certificate;
+        /** Proxy to use for the request. */
+        proxy?: string;
+    }
+
+    interface Agent {}
+
+    interface Certificate {
+        /** Override the trusted CA certificates. */
+        ca?: string[] | Buffer[];
+        /** Certificate chains in PEM format. */
+        cert?: string | string[] | Buffer | Buffer[];
+        /** Private keys in PEM format. If encrypted use together with passphrase. */
+        key?: string | string[] | Buffer | Buffer[];
+        /** Shared passphrase for a private key and/or PFX. */
+        passphrase?: string;
+        /** PFX pr PKCS12 encoded private key and certificate chain. */
+        pfx?: string[] | Buffer[];
     }
 }
 
