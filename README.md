@@ -9,7 +9,12 @@
 * [Install](#install)
 * [Usage](#usage)
   * [Methods](#options-and-methods)
+  * [HTTP Agent](#http-agent)
+  * [Proxy](#proxy)
+  * [Client Certificate](#client-certificate)
   * [File downloads](#file-downloads)
+  * [File uploads (stream)](#file-uploads-stream)
+  * [TypeScript](#typescript)
 * [Todo](#todo)
 
 ## Information
@@ -115,7 +120,7 @@ webreq.globalAgent({ maxSockets: 200, maxFreeSockets: 256 });
 
 The following options can be used for each request.
 
-For more information about the agent settings, see: [http.Agent](https://nodejs.org/api/http.html#http_class_http_agent).
+For more information about the agent settings and options, see: [http.Agent](https://nodejs.org/api/http.html#http_class_http_agent) and [socket.connect()](https://nodejs.org/api/net.html#net_socket_connect_options_connectlistener).
 
 ```js
 let options = {
@@ -136,23 +141,12 @@ let options = {
   // maxRedirects: Optional. Default is 3. Maximum amount of redirects.
   // Overrides the settings put on webreq.
   maxRedirects: Number,
-  // path: Optional: When used in a GET request for downloads, it is used as the  output path for a file.
+  // path: Optional: When used in a GET request for downloads, it is used as the  output path for a file. When used with POST or PUT it will point to a file to upload.
   path: String,
   // filename: Optional: Used together with path, if a new custom filename is to be used.
   filename: String,
-  // agent: Optional. Options object for agent for this request.
-  agent: {
-    // keepAlive: Optional. Keep sockets around for future requests.
-    keepAlive: Number,
-    // keepAliveMsecs: Optional. Specifies initial delay for Keep-Alive packets in use with the keepAlive option.
-    keepAliveMsecs: Number,
-    // maxSockets: Optional: Maximum number of sockets to allow per host.
-    maxSockets: Number,
-    // maxFreeSockets: Optional: Maximum number of sockets to leave open if keepAlive is true.
-    maxFreeSockets: Number,
-    // timeout: Optional: Socket timeout in milliseconds.
-    timeout: Number
-  },
+  // agent: Optional. http.Agent/https.Agent object.
+  agent: Object,
   // certificate: Optional. Certificate options for the request (HTTPS).
   certificate: {
     // ca: Optional: Override the trusted CA certificates.
@@ -165,7 +159,9 @@ let options = {
     passphrase: String,
     // pfx: Optional: PFX pr PKCS12 encoded private key and certificate chain.
     pfx: String | Buffer
-  }
+  },
+  // proxy: Optional. Proxy to use in the request.
+  proxy: String
 }
 ```
 
@@ -319,6 +315,89 @@ Uses `request()` but enforces `method: DELETE` in it's options.
 webreq.delete(uri, [options], [callback]);
 ```
 
+### HTTP Agent
+
+To provide a custom `http.Agent` or `https.Agent`:
+
+```js
+const http = require('http');
+// ...
+// ...
+let agent = new http.Agent(options)
+
+webreq.request('https://someurl', { method: 'GET', agent: agent })
+  .then(res => {
+    console.log(res);
+  })
+  .catch(err => {
+    console.log(err);
+  });
+
+// Or to use HTTPS.
+const https = require('https');
+// ...
+// ...
+let agent = new https.Agent(options)
+
+webreq.request('https://someurl', { method: 'GET', agent: agent })
+  .then(res => {
+    console.log(res);
+  })
+  .catch(err => {
+    console.log(err);
+  });
+```
+
+For more information about the agent settings and options, see: [http.Agent](https://nodejs.org/api/http.html#http_class_http_agent) and [socket.connect()](https://nodejs.org/api/net.html#net_socket_connect_options_connectlistener).
+
+### Proxy
+
+To send a request through a proxy, use the `proxy` option.
+
+```js
+webreq.request('https://someurl', { method: 'GET', proxy: 'https://proxy:8080' })
+  .then(res => {
+    console.log(res);
+  })
+  .catch(err => {
+    console.log(err);
+  });
+```
+
+### Client Certificate
+
+To use a certificate with a request:
+
+1. PFX
+```js
+const fs = require('fs');
+let pfx = fs.readFileSync(__dirname + '/path/to/pfx');
+
+webreq.request('https://someurl', { method: 'GET', certificate: { pfx: pfx }})
+  .then(res => {
+    console.log(res);
+  })
+  .catch(err => {
+    console.log(err);
+  });
+```
+
+2. PEM
+```js
+const fs = require('fs');
+let pem = fs.readFileSync(__dirname + '/path/to/pem');
+
+webreq.request('https://someurl', { method: 'GET', certificate: { pem: pem }})
+  .then(res => {
+    console.log(res);
+  })
+  .catch(err => {
+    console.log(err);
+  });
+```
+
+For additional options see: [https.request()](https://nodejs.org/api/https.html#https_https_request_options_callback) in the section about `tls.connect()` (`ca`, `cert`, `key`, `passphrase`, `pfx`).
+
 ### File downloads
 
 There are a couple of options of handling file downloads.
@@ -358,7 +437,97 @@ webreq.request('https://someurl/files/file1.txt', { method: 'GET', stream: true 
   });
 ```
 
+### File uploads (stream)
+
+To upload a file to an endpoint that can handle streams (depending on endpoint other headers might be needed).
+
+1. Send a file from stream:
+```js
+const fs = require('fs');
+
+let stream = fs.createReadStream(__dirname + '/image.jpg');
+
+let headers = {
+  'Content-Disposition': 'attachment; filename="image.jpg"'
+  'Content-Length': '<file-size-in-bytes>'
+  'Content-Type': 'image/jpg'
+}
+
+webreq.request('https://someurl/files', { method: 'PUT', headers: headers, body: stream })
+  .then(res => {
+    console.log(res);
+  })
+  .catch(err => {
+    console.log(err);
+  });
+```
+
+2. Send a file from a path:
+```js
+
+let headers = {
+  'Content-Disposition': 'attachment; filename="image.jpg"'
+  'Content-Length': '<file-size-in-bytes>'
+  'Content-Type': 'image/jpg'
+}
+
+webreq.request('https://someurl/files', { method: 'PUT', headers: headers, path: '/path/to/image.jpg' })
+  .then(res => {
+    console.log(res);
+  })
+  .catch(err => {
+    console.log(err);
+  });
+```
+
+### TypeScript
+
+#### RequestOptions
+
+```js
+/** HTTP method of the request. Default is GET. */
+method?: string;
+/** Headers of the request. */
+headers?: object;
+/** Data to send with the request. */
+body?: string | object;
+/** If true it will check the mime type of the response and output the results accordingly. Default is true.*/
+parse?: boolean;
+/** If true it will follow redirects found in the 'location' header. */
+followRedirects?: boolean;
+/** Maximum amount of redirects. */
+maxRedirects?: number;
+/** When used in a GET request for downloads, it is used as the output path for a file. When used with POST or PUT it will point to a file to upload. */
+path?: string;
+/** http.Agent/https.Agent object. */
+agent?: Agent;
+/** Certificate options for the request. */
+certificate?: Certificate;
+/** Proxy to use for the request. */
+proxy?: string;
+```
+
+#### Certificate
+
+```js
+/** Override the trusted CA certificates. */
+ca?: string[] | Buffer[];
+/** Certificate chains in PEM format. */
+cert?: string | string[] | Buffer | Buffer[];
+/** Private keys in PEM format. If encrypted use together with passphrase. */
+key?: string | string[] | Buffer | Buffer[];
+/** Shared passphrase for a private key and/or PFX. */
+passphrase?: string;
+/** PFX pr PKCS12 encoded private key and certificate chain. */
+pfx?: string[] | Buffer[];
+```
+
+
 ## Todo
 
-* Test `PATCH`.
-* Add file upload functionality.
+Before release `v1.0.0` the following needs to be done:
+
+* Test file upload with `form-data`
+* Test proxy requests
+* Additional testing with `http.Agent` and `https.Agent`
+* Pass in custom agent into `http.globalAgent`
