@@ -8,25 +8,25 @@ describe('request-utils', () => {
 
   describe('createRequestOptions()', () => {
 
-    it('should parse hostname, port, path and headers (HTTPS default to 443, default to GET)', () => {
+    it('should parse host, port, path and headers (HTTPS default to 443, default to GET)', () => {
 
-      let parsedUrl = url.parse('https://codecloudandrants.io');
+      let parsedUrl = url.parse('https://someurl');
       let requestOptions = createRequestOptions(parsedUrl);
 
-      expect(requestOptions.hostname).to.equal('codecloudandrants.io');
+      expect(requestOptions.host).to.equal('someurl');
       expect(requestOptions.port).to.equal(443);
       expect(requestOptions.path).to.equal('/');
       expect(requestOptions.method).to.equal('GET');
       expect(requestOptions.headers).to.be.undefined;
     });
 
-    it('should parse should parse hostname, port, path, method and headers (with port in url)', () => {
+    it('should parse should parse host, port, path, method and headers (with port in url)', () => {
 
       let options = { method: 'POST', headers: { 'Content-Type': 'application/json' } };
-      let parsedUrl = url.parse('https://codecloudandrants.io:8443/a-path?istrue=true');
+      let parsedUrl = url.parse('https://someurl:8443/a-path?istrue=true');
       let requestOptions = createRequestOptions(parsedUrl, options);
 
-      expect(requestOptions.hostname).to.equal('codecloudandrants.io');
+      expect(requestOptions.host).to.equal('someurl');
       expect(requestOptions.port).to.equal(8443);
       expect(requestOptions.path).to.equal('/a-path?istrue=true');
       expect(requestOptions.method).to.equal('POST');
@@ -36,10 +36,10 @@ describe('request-utils', () => {
     it('should set Content-Length header if a body is in the options without Content-Length', () => {
 
       let options = { method: 'POST', body: '{"data":"somedata"}' };
-      let parsedUrl = url.parse('https://codecloudandrants.io:8443/a-path?istrue=true');
+      let parsedUrl = url.parse('https://someurl:8443/a-path?istrue=true');
       let requestOptions = createRequestOptions(parsedUrl, options);
 
-      expect(requestOptions.hostname).to.equal('codecloudandrants.io');
+      expect(requestOptions.host).to.equal('someurl');
       expect(requestOptions.port).to.equal(8443);
       expect(requestOptions.path).to.equal('/a-path?istrue=true');
       expect(requestOptions.method).to.equal('POST');
@@ -49,34 +49,34 @@ describe('request-utils', () => {
     it('should set Content-Length header if a body is in the options with Content-Length', () => {
 
       let options = { method: 'POST', body: '{"data":"somedata"}', headers: {'Content-Length': 19 } };
-      let parsedUrl = url.parse('https://codecloudandrants.io:8443/a-path?istrue=true');
+      let parsedUrl = url.parse('https://someurl:8443/a-path?istrue=true');
       let requestOptions = createRequestOptions(parsedUrl, options);
 
-      expect(requestOptions.hostname).to.equal('codecloudandrants.io');
+      expect(requestOptions.host).to.equal('someurl');
       expect(requestOptions.port).to.equal(8443);
       expect(requestOptions.path).to.equal('/a-path?istrue=true');
       expect(requestOptions.method).to.equal('POST');
       expect(requestOptions.headers).to.be.an('Object');
     });
 
-    it('should parse hostname, port, path and headers (HTTP default to 80)', () => {
+    it('should parse host, port, path and headers (HTTP default to 80)', () => {
 
-      let parsedUrl = url.parse('http://codecloudandrants.io');
+      let parsedUrl = url.parse('http://someurl');
       let requestOptions = createRequestOptions(parsedUrl);
 
-      expect(requestOptions.hostname).to.equal('codecloudandrants.io');
+      expect(requestOptions.host).to.equal('someurl');
       expect(requestOptions.port).to.equal(80);
       expect(requestOptions.path).to.equal('/');
       expect(requestOptions.method).to.equal('GET');
       expect(requestOptions.headers).to.be.undefined;
     });
 
-    it('should parse hostname, port, path and headers (with port in URL)', () => {
+    it('should parse host, port, path and headers (with port in URL)', () => {
 
-      let parsedUrl = url.parse('http://codecloudandrants.io:8080');
+      let parsedUrl = url.parse('http://someurl:8080');
       let requestOptions = createRequestOptions(parsedUrl);
 
-      expect(requestOptions.hostname).to.equal('codecloudandrants.io');
+      expect(requestOptions.host).to.equal('someurl');
       expect(requestOptions.port).to.equal(8080);
       expect(requestOptions.path).to.equal('/');
       expect(requestOptions.method).to.equal('GET');
@@ -86,16 +86,27 @@ describe('request-utils', () => {
     it('should add additional ssl/cert options if protocol is https and they are provided in options.certificate', () => {
 
       let options = { method: 'POST', headers: { 'Content-Type': 'application/json' }, certificate: { ca: 'pathToCert' }};
-      let parsedUrl = url.parse('https://codecloudandrants.io');
+      let parsedUrl = url.parse('https://someurl');
 
       let requestOptions = createRequestOptions(parsedUrl, options);
 
-      expect(requestOptions.hostname).to.equal('codecloudandrants.io');
+      expect(requestOptions.host).to.equal('someurl');
       expect(requestOptions.port).to.equal(443);
       expect(requestOptions.path).to.equal('/');
       expect(requestOptions.method).to.equal('POST');
       expect(requestOptions.headers).to.be.an('Object');
       expect(requestOptions.ca).to.equal('pathToCert');
+    });
+
+    it('should handle proxy parameter', () => {
+      let options = { method: 'GET', header: { 'Content-Type': 'application/json' }, proxy: 'https://proxy.local:8080' };
+      let parsedUrl = url.parse('https://someurl');
+
+      let requestOptions = createRequestOptions(parsedUrl, options);
+
+      expect(requestOptions.host).to.equal('proxy.local');
+      expect(requestOptions.port).to.equal('8080');
+      expect(requestOptions.headers['Host']).to.equal('https://someurl');
     });
   });
 
