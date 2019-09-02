@@ -24,9 +24,9 @@
   "homepage": "https://github.com/RedeployAB/webreq#readme",
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^5.2.0",
+    "mocha": "^6.2.0",
     "nyc": "^14.1.1",
-    "sinon": "^7.2.4"
+    "sinon": "^7.4.2"
   },
   "engines": {
     "node": ">=8.5.0"
