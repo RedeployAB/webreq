@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { PassThrough } = require('stream');
+const { PassThrough, Readable } = require('stream');
 const https = require('https');
 const http = require('http');
 const assert = require('assert');
@@ -38,7 +38,26 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       return webreq.request('https://someurl.not').then(res => {
-        expect(res).to.eql({ data: "data" });
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json' }, body: { data: "data" }});
+      });
+    });
+
+    it('should handle a GET request and parse the results (promise)', () => {
+      let mockRes = { data: "data" };
+
+      let response = new PassThrough();
+      response.headers = { 'content-type': 'application/json' }
+      response.statusCode = 200;
+
+      response.write(JSON.stringify(mockRes));
+      response.end();
+
+      let request = new PassThrough();
+
+      this.request.callsArgWith(1, response).returns(request);
+
+      return webreq.request('https://someurl.not').then(res => {
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json' }, body: { data: "data" }});
       });
     });
 
@@ -58,7 +77,7 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       return webreq.request('https://someurl.not', { followRedirects: true, maxRedirects: 3 }).then(res => {
-        expect(res).to.eql({ data: "data" });
+        expect(res).to.eql({ statusCode: 302, headers: { 'content-type': 'application/json', 'location': 'https://someurl.not/redirect' }, body: { data: "data" }});
       });
     });
 
@@ -78,7 +97,7 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       return webreq.request('https://someurl.not', { followRedirects: true, maxRedirects: 3 }).then(res => {
-        expect(res).to.eql({ data: "data" });
+        expect(res).to.eql({ statusCode: 302, headers: { 'content-type': 'application/json' }, body: { data: "data" }});
       });
     });
 
@@ -106,7 +125,28 @@ describe('webreq', () => {
       };
 
       return webreq.request('https://someurl.not', options).then(res => {
-        expect(res).to.eql({ data: "data" });
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json' }, body: { data: "data" }});
+      });
+    });
+
+    it('should handle a GET request with modified agent settings (false) (promise)', () => {
+      let mockRes = { data: "data" };
+
+      let response = new PassThrough();
+      response.headers = { 'content-type': 'application/json' }
+      response.statusCode = 200;
+
+      response.write(JSON.stringify(mockRes));
+      response.end();
+
+      let request = new PassThrough();
+
+      this.request.callsArgWith(1, response).returns(request);
+
+      let options = { agent: false };
+
+      return webreq.request('https://someurl.not', options).then(res => {
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json' }, body: { data: "data" }});
       });
     });
 
@@ -124,7 +164,7 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       webreq.request('https://someurl.not', (err, res) => {
-        expect(res).to.eql({ data: "data" });
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json' }, body: { data: "data" }});
         done();
       });
     });
@@ -143,7 +183,7 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       webreq.request('https://someurl.not', { method: 'GET' }, (err, res) => {
-        expect(res).to.eql({ data: "data" });
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json' }, body: { data: "data" }});
         done();
       });
     });
@@ -152,7 +192,7 @@ describe('webreq', () => {
       let mockRes = '[{"some":"data"';
       let response = new PassThrough();
       response.headers = { 'content-type': 'application/json' }
-      response.statusCode = 200;
+      response.statusCode = 400;
 
       response.write(mockRes);
       response.end();
@@ -162,7 +202,7 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       webreq.request('https://someurl.not', { method: 'GET' }, (err, res) => {
-        expect(res).to.equal('Malformed JSON.');
+        expect(res).to.eql({ statusCode: 400, headers: { 'content-type': 'application/json' },  body: 'Malformed JSON.' });
         done();
       });
     });
@@ -181,7 +221,7 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       webreq.request('https://someurl.not', { method: 'GET', parse: false }, (err, res) => {
-        expect(res).to.eql('{"data":"data"}');
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json' }, body: '{"data":"data"}'});
         done();
       });
     });
@@ -199,7 +239,7 @@ describe('webreq', () => {
 
       this.request.callsArgWith(1, response).returns(request);
 
-      webreq.request('https://someurl.not', { method: 'GET', bodyOnly: false }, (err, res) => {
+      webreq.request('https://someurl.not', { method: 'GET' }, (err, res) => {
         expect(res).to.eql({ headers: { 'content-type': 'application/json' }, statusCode: 200, body: mockRes });
         done();
       });
@@ -221,7 +261,7 @@ describe('webreq', () => {
       let mockRes = { data: "data" };
 
       let response = new PassThrough();
-      response.headers = { 'content-type': 'application/json' }
+      response.headers = { 'content-type': 'application/json' };
       response.statusCode = 200;
 
       response.write(JSON.stringify(mockRes));
@@ -232,7 +272,7 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       return webreq.get('https://someurl.not').then(res => {
-        expect(res).to.eql({ data: "data" });
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json' }, body: { data: "data" }});
       });
     });
 
@@ -250,7 +290,7 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       webreq.get('https://someurl.not', (err, res) => {
-        expect(res).to.eql({ data: "data" });
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json' },  body: { data: "data" }});
         done();
       });
     });
@@ -339,7 +379,7 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       webreq.post('https://someurl.not/id/1').then(res => {
-        expect(res).to.eql({ data: "data" });
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json' }, body: { data: "data" }});
         done();
       });
     });
@@ -359,7 +399,7 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       webreq.post('https://someurl.not', (err, res) => {
-        expect(res).to.eql({ data: "data" });
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json' }, body: { data: "data" }});
         done();
       });
     });
@@ -420,7 +460,7 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       webreq.put('https://someurl.not/id/1').then(res => {
-        expect(res).to.eql({ data: "data" });
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json' }, body: { data: "data" }});
         done();
       });
     });
@@ -440,7 +480,7 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       webreq.put('https://someurl.not', (err, res) => {
-        expect(res).to.eql({ data: "data" });
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json' }, body: { data: "data" }});
         done();
       });
     });
@@ -472,7 +512,7 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       return webreq.delete('https://someurl.not/id/1', { method: 'DELETE' }).then(res => {
-        expect(res).to.be.null;
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json' }, body: null });
       });
     });
 
@@ -490,7 +530,7 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       webreq.delete('https://someurl.not/id/1', { method: 'DELETE' }, (err, res) => {
-        expect(res).to.be.null;
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json'}, body: null })
         done();
       });
     });
@@ -510,7 +550,7 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       return webreq.delete('https://someurl.not/id/1').then(res => {
-        expect(res).to.be.null;
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json' }, body: null });
       });
     });
 
@@ -528,7 +568,7 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       webreq.delete('https://someurl.not/id/1', (err, res) => {
-        expect(res).to.be.null;
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json' }, body: null });
         done();
       });
     });
@@ -574,7 +614,7 @@ describe('webreq', () => {
       done();
     });
 
-    it('should handle a PATCH request and parse the results (promise), enforce method', (done) => {
+    it('should handle a PATCH request and parse the results (promise), enforce method', () => {
       let mockRes = { data: "data" };
 
       let response = new PassThrough();
@@ -588,9 +628,8 @@ describe('webreq', () => {
 
       this.request.callsArgWith(1, response).returns(request);
 
-      webreq.patch('https://someurl.not/id/1').then(res => {
-        expect(res).to.eql({ data: "data" });
-        done();
+      return webreq.patch('https://someurl.not/id/1').then(res => {
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json' }, body: { data: "data" }});
       });
     });
 
@@ -609,21 +648,21 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       webreq.patch('https://someurl.not', (err, res) => {
-        expect(res).to.eql({ data: "data" });
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json' }, body: { data: "data" }});
         done();
       });
     });
 
   });
 
-  describe('configureGlobalAgent()', () => {
+  describe('globalAgent()', () => {
     it('should configure the global agent settings of webreq (http/https)', () => {
       let httpMs = http.globalAgent.maxSockets;
       let httpMfs = http.globalAgent.maxFreeSockets;
       let httpsMs = https.globalAgent.maxSockets;
       let httpsMfs = https.globalAgent.maxFreeSockets;
 
-      webreq.configureGlobalAgent({ maxSockets: 200, maxFreeSockets: 210 });
+      webreq.globalAgent({ maxSockets: 200, maxFreeSockets: 210 });
       expect(http.globalAgent.maxSockets).to.equal(200);
       expect(http.globalAgent.maxFreeSockets).to.equal(210);
       expect(https.globalAgent.maxSockets).to.equal(200);
@@ -636,7 +675,7 @@ describe('webreq', () => {
     });
 
     it('should configure the global agent settings of webreq (http/https), no settings, leave default settings', () => {
-      webreq.configureGlobalAgent();
+      webreq.globalAgent();
       expect(http.globalAgent.maxSockets).to.equal(Infinity);
       expect(http.globalAgent.maxFreeSockets).to.equal(256);
       expect(https.globalAgent.maxSockets).to.equal(Infinity);
@@ -696,7 +735,7 @@ describe('webreq', () => {
       this.request.callsArgWith(1, response).returns(request);
 
       return webreq.request('http://someurl.not').then(res => {
-        expect(res).to.eql({ data: "data" });
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json' }, body: { data: "data" }});
       });
     });
   });
@@ -730,11 +769,11 @@ describe('webreq', () => {
       }
 
       return webreq.request('https://someurl.not', { path: outputPath }).then(res => {
-        expect(res).to.be.null;
+        expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/zip', 'content-disposition': 'attachment; filename=file1.zip' }, body: null })
       });
     });
 
-    it('should handle a GET request with file upload (promise), full response', () => {
+    it('should handle a GET request with file upload (promise)', () => {
       let file = fs.readFileSync(path.join(__dirname, 'mockdata', 'file1.zip'));
 
       let response = new PassThrough();
@@ -754,7 +793,7 @@ describe('webreq', () => {
         fs.mkdirSync(outputPath);
       }
 
-      return webreq.request('https://someurl.not', { path: outputPath, bodyOnly: false }).then(res => {
+      return webreq.request('https://someurl.not', { path: outputPath }).then(res => {
         expect(res.statusCode).to.equal(200);
         expect(res.body).to.be.null;
       });
@@ -781,7 +820,7 @@ describe('webreq', () => {
         fs.mkdirSync(outputPath);
       }
 
-      return webreq.request('https://someurl.not', { path: outputPath, filename: filename, bodyOnly: false }).then(res => {
+      return webreq.request('https://someurl.not', { path: outputPath, filename: filename }).then(res => {
         expect(res.statusCode).to.equal(200);
         expect(res.body).to.be.null;
       });
@@ -807,7 +846,7 @@ describe('webreq', () => {
         fs.mkdirSync(outputPath);
       }
 
-      return webreq.request('https://someurl.not/file4.zip', { path: outputPath, bodyOnly: false }).then(res => {
+      return webreq.request('https://someurl.not/file4.zip', { path: outputPath }).then(res => {
         expect(res.statusCode).to.equal(200);
         expect(res.body).to.be.null;
       });
@@ -860,5 +899,56 @@ describe('webreq', () => {
           expect(res instanceof Stream)
         });
     })
+  });
+
+  describe('stream as body', () => {
+    beforeEach(() => {
+      this.request = sinon.stub(https, 'request');
+    });
+
+    afterEach(() => {
+      https.request.restore();
+    });
+
+    it('should write stream to request body', (done) => {
+      let request = new PassThrough()
+      let write = sinon.spy(request, 'write');
+      let end = sinon.spy(request, 'end');
+
+      this.request.returns(request);
+
+      // Fake readable stream with mock data.
+      let rs = new Readable();
+      rs._read = () => {};
+      rs.push(Buffer.from('Test data'));
+      rs.push(null);
+
+      let contentLength = rs._readableState.length;
+      webreq.request('https://someurl.not/a-stream', { method: 'PUT', body: rs, headers: { 'Content-Length': contentLength }}).then(() => {});
+      
+      // Due to the nature of streams, time out is used here.
+      setTimeout(() => {
+        assert(write.called);
+        assert(end.called);
+        done();
+      }, 10);     
+    });
+
+    it('should read a file into stream and use as body when path is used with POST/PUT', (done) => {
+      let request = new PassThrough()
+      let write = sinon.spy(request, 'write');
+      let end = sinon.spy(request, 'end');
+
+      this.request.returns(request);
+
+      webreq.request('https://someurl.not/a-stream', { method: 'POST', path: __dirname + '/mockdata/test.txt'}).then(() => {});
+      
+      // Due to the nature of streams, time out is used here.
+      setTimeout(() => {
+        assert(write.called);
+        assert(end.called);
+        done();
+      }, 10);  
+    });
   });
 });

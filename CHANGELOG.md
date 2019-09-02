@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.0
+
+* Added support for providing certificate options with HTTPS requests. See further documentation: [https](https://nodejs.org/api/https.html#https_https_request_options_callback) and [tls](https://nodejs.org/api/tls.html#tls_tls_connect_options_callback).
+* Added support for using a proxy in requests. `options.proxy` set to the full URL of the proxy.
+* `bodyOnly` options has been removed. This means by all responses will be of type `Response` (`statusCode`, `headers` and `body`).
+* Changed function name from `configureGlobalAgent()` to `globalAgent()`.
+* Can handle file uploads. Pass a read `stream` to `options.body`, or set a file path in `options.path`.
+* Added **TypeScript** declaration.
+
 ## 0.4.0
 
 * Added support for file downloads. Uses `path` and `filename`, specified in `options`.
