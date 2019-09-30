@@ -355,7 +355,28 @@ For more information about the agent settings and options, see: [http.Agent](htt
 To send a request through a proxy, use the `proxy` option.
 
 ```js
-webreq.request('https://someurl', { method: 'GET', proxy: 'https://proxy:8080' })
+webreq.request('http://someurl', { method: 'GET', proxy: 'http://proxy:8080' })
+  .then(res => {
+    console.log(res);
+  })
+  .catch(err => {
+    console.log(err);
+  });
+```
+
+At this time the `proxy` option only supports **HTTP**.
+Native support for **HTTPS** will be added in a future release.
+
+For now pass in an agent that manages the proxy request, for example: [https-proxy-agent](https://www.npmjs.com/package/https-proxy-agent).
+
+To use it:
+
+```js
+const HttpsProxyAgent = require('https-proxy-agent');
+// ...
+// ...
+let agent = new HttpsProxyAgent('https://proxy:8080');
+webreq.request('https://someurl', { agent: agent })
   .then(res => {
     console.log(res);
   })
@@ -527,7 +548,6 @@ pfx?: string[] | Buffer[];
 
 Before release `v1.0.0` the following needs to be done:
 
-* Test file upload with `form-data`
-* Test proxy requests
-* Additional testing with `http.Agent` and `https.Agent`
-* Pass in custom agent into `http.globalAgent`
+* Add own native way of handling proxy with HTTPS.
+* Add file upload with `multipart/form-data`.
+* Pass in custom agent into `http.globalAgent`.
