@@ -115,16 +115,14 @@ describe('webreq', () => {
 
       this.request.callsArgWith(1, response).returns(request);
 
-      let options = {
-        agent: {
+      let agent = new https.Agent({
           keepAlive: true,
           keepAliveMsecs: 500,
           maxSockets: 256,
           maxFreeSockets: 256
-        }
-      };
+      });
 
-      return webreq.request('https://someurl.not', options).then(res => {
+      return webreq.request('https://someurl.not', { agent: agent }).then(res => {
         expect(res).to.eql({ statusCode: 200, headers: { 'content-type': 'application/json' }, body: { data: "data" }});
       });
     });

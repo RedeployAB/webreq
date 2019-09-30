@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1
+
+* Fixed error that didn't use the provided `http.Agent/https.Agent` but instead created an new agent with provided options.
+
 ## 0.5.0
 
 * Added support for providing certificate options with HTTPS requests. See further documentation: [https](https://nodejs.org/api/https.html#https_https_request_options_callback) and [tls](https://nodejs.org/api/tls.html#tls_tls_connect_options_callback).
