@@ -118,7 +118,7 @@ To modify the `http.globalAgent` and `https.globalAgent`:
 let agent = new https.Agent(options);
 webreq.globalAgent(agent);
 // or
-let agnet = new http.Agent(options);
+let agent = new http.Agent(options);
 webreq.globalAgent(agent);
 ```
 
@@ -325,7 +325,16 @@ Returns a new instance of `WebReq`.
 
 ### Error handling
 
+Errors will only be returned and thrown if there is a send or receive error.
+All other statuses will be deemed as a successful call, so handle it accordingly.
 
+```js
+// Example.
+let res = await webreq.request('<url'>);
+if (res.statusCode >= 300 && res.statusCode <= 511) {
+  throw new Error('Non 2xx result.')
+}
+```
 
 ### HTTP Agent
 
