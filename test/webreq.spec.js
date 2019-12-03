@@ -1,3 +1,5 @@
+'use strict';
+
 const { expect } = require('chai');
 const sinon = require('sinon');
 const { PassThrough, Readable } = require('stream');
@@ -655,21 +657,22 @@ describe('webreq', () => {
 
   describe('globalAgent()', () => {
     it('should configure the global agent settings of webreq (http/https)', () => {
-      let httpMs = http.globalAgent.maxSockets;
-      let httpMfs = http.globalAgent.maxFreeSockets;
-      let httpsMs = https.globalAgent.maxSockets;
-      let httpsMfs = https.globalAgent.maxFreeSockets;
+      let httpAgentOld = http.globalAgent;
+      let httpsAgentOld = https.globalAgent;
 
-      webreq.globalAgent({ maxSockets: 200, maxFreeSockets: 210 });
+      let httpAgent = new http.Agent({ maxSockets: 200, maxFreeSockets: 210 });
+      let httpsAgent = new https.Agent({ maxSockets: 200, maxFreeSockets: 210 });
+
+      webreq.globalAgent(httpAgent)
+      webreq.globalAgent(httpsAgent)
+
       expect(http.globalAgent.maxSockets).to.equal(200);
       expect(http.globalAgent.maxFreeSockets).to.equal(210);
       expect(https.globalAgent.maxSockets).to.equal(200);
       expect(https.globalAgent.maxFreeSockets).to.equal(210);
 
-      http.globalAgent.maxSockets = httpMs;
-      http.globalAgent.maxFreeSockets = httpMfs;
-      https.globalAgent.maxSockets = httpsMs;
-      https.globalAgent.maxFreeSockets = httpsMfs;
+      http.globalAgent = httpAgentOld;
+      https.globalAgent = httpsAgentOld;
     });
 
     it('should configure the global agent settings of webreq (http/https), no settings, leave default settings', () => {
@@ -948,5 +951,29 @@ describe('webreq', () => {
         done();
       }, 10);  
     });
+  });
+
+  describe('webreq()', () => {
+
+    it('should return a new instance of webreq', () => {
+      let wr = webreq.webreq();
+      expect(wr === webreq).to.be.false;
+    });
+
+    it('should return a new instance of webreq with provided options', () => {
+      let options = {
+        stream: true,
+        parse: false,
+        followRedirects: true,
+        maxRedirects: 5
+      };
+
+      let wr = webreq.webreq(options);
+
+      expect(wr.stream).to.be.true;
+      expect(wr.parse).to.be.false;
+      expect(wr.followRedirects).to.be.true;
+      expect(wr.maxRedirects).to.equal(5);
+    })
   });
 });

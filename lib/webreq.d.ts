@@ -39,7 +39,7 @@ declare class WebReq {
         options?: WebReq.RequestOptions,
         callback?: (err: Error, res: WebReq.Response) => void
     ): Promise<WebReq.Response | Error> | void;
-    
+
     /**
     * Performs a HTTP/HTTPS POST request.
     * If the optional callback is used it will return a function, if no callback is used it will
@@ -104,18 +104,27 @@ declare class WebReq {
         callback?: (err: Error, res: WebReq.Response) => void
     ): Promise<WebReq.Response | Error> | void;
 
-   /**
-   * Configures the global agent for the requests.
-   * If no parameter is passed, it will set default vaules of maxSockets: Infinity, maxFreeSockets: 256.
-   * @param {object} [options] Options object.
-   * @param {number} [options.maxSockets] Maximum number of sockets to allow per host.
-   * @param {number} [options.maxFreeSockets] Maximum number of sockets to leave open if keepAlive is true.
-   * @return {void}
-   */
-    globalAgent(options: object): void;
+    /**
+    * Configures the global agent for the requests.
+    * Accepts http.Agent and https.Agent.
+    * @param {object} agent http.Agent/https.Agent.
+    * @return {void}
+    */
+    globalAgent(agent: http.Agent|https.Agent): void;
+
+    /**
+    * Returns a new instance of WebReq.
+    * @param {object} [options] Options object.
+    * @param {boolean} [options.stream] If true it will return the response as a stream. Default is false.
+    * @param {boolean} [options.parse] If true it will try to parse the response according to MIME type,
+    * if false will return pure string. Default is true.
+    * @param {boolean} [options.followRedirects] If true it will follow redirects found in the 'location' header.
+    * @param {number} [options.maxRedirects] Max amount of redirects. Default is 3.
+    */
+    webreq(options: object): WebReq;
 }
 
-interface Buffer {}
+interface Buffer { }
 
 declare namespace WebReq {
 
@@ -125,10 +134,10 @@ declare namespace WebReq {
         /** Headers of the response */
         headers: object;
         /** Body of the response */
-        body: string|object;
+        body: string | object;
     }
 
-    interface RequestOptions  {
+    interface RequestOptions {
         /** HTTP method of the request. Default is GET. */
         method?: string;
         /** Headers of the request. */
@@ -158,7 +167,7 @@ declare namespace WebReq {
         proxy?: string;
     }
 
-    interface Agent {}
+    interface Agent { }
 
     interface Certificate {
         /** Override the trusted CA certificates. */
