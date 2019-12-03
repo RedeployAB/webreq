@@ -1,6 +1,6 @@
 {
   "name": "webreq",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Small and simple module for handling HTTP/HTTPS requests.",
   "main": "lib/webreq.js",
   "scripts": {

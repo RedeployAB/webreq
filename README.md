@@ -9,6 +9,7 @@
 * [Install](#install)
 * [Usage](#usage)
   * [Methods](#options-and-methods)
+  * [Error Handling](#error-handling)
   * [HTTP Agent](#http-agent)
   * [Proxy](#proxy)
   * [Client Certificate](#client-certificate)
@@ -112,10 +113,13 @@ webreq.maxRedirects: Number
 To modify the `http.globalAgent` and `https.globalAgent`:
 
 ```js
-// Set maxSockets for all requests.
-webreq.globalAgent({ maxSockets: 200 });
-// Set maxSockets and maxFreeSockets for all requests (only viable when keepAlive is used in that request).
-webreq.globalAgent({ maxSockets: 200, maxFreeSockets: 256 });
+// Create a new agent with options, available options at: https://nodejs.org/api/http.html#http_new_agent_options
+// and https://nodejs.org/api/https.html#https_new_agent_options
+let agent = new https.Agent(options);
+webreq.globalAgent(agent);
+// or
+let agent = new http.Agent(options);
+webreq.globalAgent(agent);
 ```
 
 The following options can be used for each request.
@@ -313,6 +317,23 @@ Uses `request()` but enforces `method: DELETE` in it's options.
 
 ```js
 webreq.delete(uri, [options], [callback]);
+```
+
+#### `webreq()`
+
+Returns a new instance of `WebReq`.
+
+### Error handling
+
+Errors will only be returned and thrown if there is a send or receive error.
+All other statuses will be deemed as a successful call, so handle it accordingly.
+
+```js
+// Example.
+let res = await webreq.request('<url'>);
+if (res.statusCode >= 300 && res.statusCode <= 511) {
+  throw new Error('Non 2xx result.')
+}
 ```
 
 ### HTTP Agent
@@ -548,6 +569,4 @@ pfx?: string[] | Buffer[];
 
 Before release `v1.0.0` the following needs to be done:
 
-* Add own native way of handling proxy with HTTPS.
-* Add file upload with `multipart/form-data`.
-* Pass in custom agent into `http.globalAgent`.
+* Test file upload with `multipart/form-data`.

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.0
+
+* Added method `webreq()` which returns a new instance of `WebReq`.
+* Updated `globalAgent()` to accept `http.Agent/https.Agent`.
+
 ## 0.5.1
 
 * Fixed error that didn't use the provided `http.Agent/https.Agent` but instead created an new agent with provided options.
