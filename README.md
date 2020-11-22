@@ -1,6 +1,6 @@
 # webreq
 
-![Build](https://github.com/RedeployAB/webreq/workflows/Test/badge.svg)
+![Test](https://github.com/RedeployAB/webreq/workflows/Test/badge.svg)
 
 > Small and simple module for handling HTTP/HTTPS requests.
 
