@@ -1,5 +1,7 @@
 # webreq
 
+> **Deprecated:** Node.js 18+ includes native `fetch`. Use that instead for new projects.
+
 ![Test](https://github.com/RedeployAB/webreq/workflows/Test/badge.svg)
 
 > Small and simple module for handling HTTP/HTTPS requests.
